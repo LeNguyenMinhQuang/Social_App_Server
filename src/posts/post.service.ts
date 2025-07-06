@@ -142,24 +142,26 @@ export class PostService {
     async likePost(_id: string, user: IUser) {
         const res = await this.postModel.findOneAndUpdate(
             { _id },
-            {
-                $set: {
-                    likeBy: {
-                        $cond: {
-                            if: { $in: [user._id, '$likeBy'] },
-                            then: { $setDifference: ['$likeBy', [user._id]] },
-                            else: { $concatArrays: ['$likeBy', [user._id]] },
+            [
+                {
+                    $set: {
+                        likeBy: {
+                            $cond: {
+                                if: { $in: [user._id, '$likeBy'] },
+                                then: { $setDifference: ['$likeBy', [user._id]] },
+                                else: { $concatArrays: ['$likeBy', [user._id]] },
+                            },
                         },
-                    },
-                    likesCount: {
-                        $cond: {
-                            if: { $in: [user._id, '$likeBy'] },
-                            then: { $subtract: ['$likesCount', 1] },
-                            else: { $add: ['$likesCount', 1] },
+                        likesCount: {
+                            $cond: {
+                                if: { $in: [user._id, '$likeBy'] },
+                                then: { $subtract: ['$likesCount', 1] },
+                                else: { $add: ['$likesCount', 1] },
+                            },
                         },
                     },
                 },
-            },
+            ],
             {
                 new: true,
             },

@@ -21,6 +21,12 @@ export class CommentsController {
         return this.commentsService.findAll(qs, +page);
     }
 
+    @Message('Get all comment by post')
+    @Get('post/:postId')
+    getByPost(@Param('postId') postId: string, @Query('page') page: string) {
+        return this.commentsService.findByPost(postId, +page);
+    }
+
     @Message('Get a Comment')
     @Get(':id')
     findOne(@Param('id') id: string) {

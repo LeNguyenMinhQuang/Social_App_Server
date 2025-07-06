@@ -46,6 +46,9 @@ export class AuthService {
         const { _id } = user;
         await this.usersService.updateUserToken(null, _id);
         res.clearCookie('refresh_token');
+        return {
+            message: 'Logged Out',
+        };
     }
 
     async refreshNewTokenWhenAccessTokenExpired(refresh_token: string, res: Response) {

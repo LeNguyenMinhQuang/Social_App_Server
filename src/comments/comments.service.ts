@@ -65,6 +65,40 @@ export class CommentsService {
         }
     }
 
+    async findByPost(postId: string, page: number = 1) {
+        const _filter = { postId: postId, isDeleted: false };
+        const _limit = 5;
+        const _sort = '-createdAt';
+        const _skip = (page - 1) * _limit;
+        const _select = ['-createBy', '-updatedBy', '-deletedBy', '-isDeleted', '-deletedAt', '-__v'];
+        const _populate = [{ path: 'userId', select: ['_id', 'userName', 'role', 'gender', 'avatar'] }];
+
+        const totalItems = (await this.commentModel.find(_filter).exec()).length;
+        const totalPages = Math.ceil(totalItems / _limit);
+
+        const res = await this.commentModel
+            .find(_filter)
+            .select(_select)
+            .populate(_populate)
+            .skip(_skip)
+            .limit(_limit)
+            .sort(_sort as any)
+            .exec();
+        if (res) {
+            return {
+                meta: {
+                    page: page,
+                    limit: _limit,
+                    pages: totalPages,
+                    total: totalItems,
+                },
+                data: res,
+            };
+        } else {
+            throw new InternalServerErrorException();
+        }
+    }
+
     async findOne(id: string) {
         const _select = ['-createBy', '-updatedBy', '-deletedBy', '-isDeleted', '-deletedAt', '-__v'];
         const _populate = [{ path: 'userId', select: ['_id', 'userName', 'role', 'gender', 'avatar'] }];
